@@ -153,7 +153,7 @@ export async function updateWorkflowRun(runId: string, updates: {
 export async function callLLM(config: any, input: any, attempt = 1): Promise<any> {
   const maxAttempts = 3
   const prompt = config.prompt || 'Summarize the input.'
-  const model = config.model || 'llama3-8b-8192'
+  const model = config.model || 'llama-3.1-8b-instant'
 
   if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === 'your-groq-api-key') {
     await sleep(600)

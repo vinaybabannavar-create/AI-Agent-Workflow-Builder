@@ -37,7 +37,7 @@ const MOCK_WORKFLOWS_BY_ORG: Record<string, any[]> = {
           name: 'Classify Ticket (LLM)',
           type: 'llm_call',
           order_index: 0,
-          config: { prompt: 'Classify this ticket: "High priority server outage on production database!"', model: 'llama3-8b-8192' },
+          config: { prompt: 'Classify this ticket: "High priority server outage on production database!"', model: 'llama-3.1-8b-instant' },
         },
         {
           id: 's-2',
@@ -87,7 +87,7 @@ const MOCK_WORKFLOWS_BY_ORG: Record<string, any[]> = {
           name: 'Process Payroll Batch',
           type: 'llm_call',
           order_index: 0,
-          config: { prompt: 'Process payroll batch for Org B staff.', model: 'llama3-8b-8192' },
+          config: { prompt: 'Process payroll batch for Org B staff.', model: 'llama-3.1-8b-instant' },
         },
       ],
       triggers: [{ trigger_type: 'manual', config: {} }],

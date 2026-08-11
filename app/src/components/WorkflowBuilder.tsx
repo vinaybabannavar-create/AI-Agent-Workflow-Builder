@@ -145,7 +145,7 @@ export function WorkflowBuilder({
             name: 'Classify Ticket (LLM)',
             type: 'llm_call',
             order_index: 0,
-            config: { prompt: 'Classify this ticket: "High priority server outage on production database!"', model: 'llama3-8b-8192' },
+            config: { prompt: 'Classify this ticket: "High priority server outage on production database!"', model: 'llama-3.1-8b-instant' },
           },
           {
             id: 'step-2',
@@ -205,7 +205,7 @@ export function WorkflowBuilder({
       order_index: steps.length,
       config:
         type === 'llm_call'
-          ? { prompt: 'Analyze input payload', model: 'llama3-8b-8192' }
+          ? { prompt: 'Analyze input payload', model: 'llama-3.1-8b-instant' }
           : type === 'http_request'
           ? { url: 'https://httpbin.org/post', method: 'POST' }
           : type === 'conditional_branch'
