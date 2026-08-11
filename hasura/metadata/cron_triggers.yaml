@@ -1,0 +1,54 @@
+version: 3
+event_triggers:
+  - name: notify_step_trigger
+    definition:
+      enable_manual: true
+      insert:
+        columns: "*"
+      update:
+        columns:
+          - status
+    table:
+      schema: public
+      name: step_runs
+    webhook: "{{ACTION_BASE_URL}}/api/event-notify"
+    headers:
+      - name: x-hasura-event-secret
+        value_from_env: HASURA_EVENT_SECRET
+    retry_conf:
+      num_retries: 3
+      interval_sec: 10
+      timeout_sec: 60
+
+  - name: db_event_workflow_trigger
+    definition:
+      enable_manual: false
+      insert:
+        columns: "*"
+    table:
+      schema: public
+      name: workflow_runs
+    webhook: "{{ACTION_BASE_URL}}/api/db-event-trigger"
+    headers:
+      - name: x-hasura-event-secret
+        value_from_env: HASURA_EVENT_SECRET
+    retry_conf:
+      num_retries: 2
+      interval_sec: 5
+      timeout_sec: 30
+
+cron_triggers:
+  - name: scheduled_workflow_runner
+    webhook: "{{ACTION_BASE_URL}}/api/scheduled-trigger"
+    schedule: "* * * * *"
+    include_in_metadata: true
+    payload:
+      trigger_type: scheduled
+    headers:
+      - name: x-hasura-cron-secret
+        value_from_env: HASURA_CRON_SECRET
+    retry_conf:
+      num_retries: 2
+      interval_sec: 30
+      timeout_sec: 60
+    comment: "Runs every minute to check for scheduled workflow triggers"

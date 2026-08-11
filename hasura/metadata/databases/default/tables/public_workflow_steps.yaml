@@ -1,0 +1,100 @@
+table:
+  schema: public
+  name: workflow_steps
+object_relationships:
+  - name: workflow
+    using:
+      foreign_key_constraint_on: workflow_id
+array_relationships:
+  - name: step_runs
+    using:
+      foreign_key_constraint_on:
+        column: workflow_step_id
+        table:
+          schema: public
+          name: step_runs
+select_permissions:
+  - role: owner
+    permission:
+      columns: "*"
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+  - role: editor
+    permission:
+      columns: "*"
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+  - role: viewer
+    permission:
+      columns: "*"
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+insert_permissions:
+  - role: owner
+    permission:
+      check:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+      columns:
+        - workflow_id
+        - order_index
+        - name
+        - type
+        - config
+  - role: editor
+    permission:
+      check:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+        # editors cannot add restricted step types (enforced in action handler too)
+        type:
+          _nin:
+            - db_write
+            - notify
+      columns:
+        - workflow_id
+        - order_index
+        - name
+        - type
+        - config
+update_permissions:
+  - role: owner
+    permission:
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+      columns:
+        - order_index
+        - name
+        - type
+        - config
+  - role: editor
+    permission:
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"
+        type:
+          _nin:
+            - db_write
+            - notify
+      columns:
+        - order_index
+        - name
+        - config
+delete_permissions:
+  - role: owner
+    permission:
+      filter:
+        workflow:
+          org_id:
+            _in: "X-Hasura-Org-Ids"

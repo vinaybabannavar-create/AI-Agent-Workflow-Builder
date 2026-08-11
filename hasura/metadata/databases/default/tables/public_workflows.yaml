@@ -1,0 +1,94 @@
+table:
+  schema: public
+  name: workflows
+object_relationships:
+  - name: organization
+    using:
+      foreign_key_constraint_on: org_id
+array_relationships:
+  - name: steps
+    using:
+      foreign_key_constraint_on:
+        column: workflow_id
+        table:
+          schema: public
+          name: workflow_steps
+  - name: triggers
+    using:
+      foreign_key_constraint_on:
+        column: workflow_id
+        table:
+          schema: public
+          name: workflow_triggers
+  - name: runs
+    using:
+      foreign_key_constraint_on:
+        column: workflow_id
+        table:
+          schema: public
+          name: workflow_runs
+select_permissions:
+  - role: owner
+    permission:
+      columns: "*"
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+  - role: editor
+    permission:
+      columns: "*"
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+  - role: viewer
+    permission:
+      columns: "*"
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+insert_permissions:
+  - role: owner
+    permission:
+      check:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+      columns:
+        - org_id
+        - name
+        - description
+        - created_by
+  - role: editor
+    permission:
+      check:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+      columns:
+        - org_id
+        - name
+        - description
+        - created_by
+update_permissions:
+  - role: owner
+    permission:
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+      columns:
+        - name
+        - description
+        - is_active
+  - role: editor
+    permission:
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"
+      columns:
+        - name
+        - description
+        - is_active
+delete_permissions:
+  - role: owner
+    permission:
+      filter:
+        org_id:
+          _in: "X-Hasura-Org-Ids"

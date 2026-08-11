@@ -1,0 +1,83 @@
+version: 3
+actions:
+  - name: triggerWorkflowRun
+    definition:
+      kind: synchronous
+      handler: "{{ACTION_BASE_URL}}/api/trigger-run"
+      forward_client_headers: true
+    request_transform:
+      method: POST
+      content_type: application/json
+    permissions:
+      - role: owner
+      - role: editor
+    comment: "Trigger a workflow run — verifies org membership + quota in handler"
+
+  - name: approveStep
+    definition:
+      kind: synchronous
+      handler: "{{ACTION_BASE_URL}}/api/approve-step"
+      forward_client_headers: true
+    request_transform:
+      method: POST
+      content_type: application/json
+    permissions:
+      - role: owner
+      - role: editor
+    comment: "Approve a paused approval_gate step — role check done in handler"
+
+  - name: webhookTrigger
+    definition:
+      kind: synchronous
+      handler: "{{ACTION_BASE_URL}}/api/webhook-trigger"
+      forward_client_headers: false
+    request_transform:
+      method: POST
+      content_type: application/json
+    comment: "Inbound webhook endpoint — starts a workflow run from external systems"
+
+custom_types:
+  objects:
+    - name: TriggerRunOutput
+      fields:
+        - name: workflow_run_id
+          type: String!
+        - name: status
+          type: String!
+        - name: message
+          type: String
+    - name: ApproveStepOutput
+      fields:
+        - name: step_run_id
+          type: String!
+        - name: status
+          type: String!
+        - name: message
+          type: String
+    - name: WebhookTriggerOutput
+      fields:
+        - name: workflow_run_id
+          type: String!
+        - name: status
+          type: String!
+  input_objects:
+    - name: TriggerRunInput
+      fields:
+        - name: workflow_id
+          type: String!
+        - name: payload
+          type: String
+    - name: ApproveStepInput
+      fields:
+        - name: step_run_id
+          type: String!
+        - name: comment
+          type: String
+    - name: WebhookTriggerInput
+      fields:
+        - name: workflow_id
+          type: String!
+        - name: secret
+          type: String!
+        - name: payload
+          type: String
