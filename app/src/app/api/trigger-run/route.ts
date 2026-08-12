@@ -29,32 +29,35 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
+let workflow: any
+let role: 'owner' | 'editor' | 'viewer'
 
-    let workflow: any
-    let role: 'owner' | 'editor' | 'viewer' = 'owner'
+try {
+  const verified = await verifyOrgMembership(userId, workflow_id)
+  workflow = verified.workflow
+  role = verified.role
+} catch (e: any) {
+  return NextResponse.json(
+    { message: e.message || 'Access denied: not a member of this workflow\'s org' },
+    { status: 403 }
+  )
+}
 
-    try {
-      const verified = await verifyOrgMembership(userId, workflow_id)
-      workflow = verified.workflow
-      role = verified.role
-    } catch (e: any) {
-      // Fallback demo mode if Nhost database is not connected
-      workflow = { org_id: '11111111-1111-1111-1111-111111111111' }
-      role = 'owner'
-    }
+if (role === 'viewer') {
+  return NextResponse.json(
+    { message: 'Viewers cannot trigger workflow runs' },
+    { status: 403 }
+  )
+}
 
-    if (role === 'viewer') {
-      return NextResponse.json(
-        { message: 'Viewers cannot trigger workflow runs' },
-        { status: 403 }
-      )
-    }
-
-    try {
-      await checkAndIncrementQuota(workflow.org_id)
-    } catch (e: any) {
-      // Ignore quota error if database not connected
-    }
+try {
+  await checkAndIncrementQuota(workflow.org_id)
+} catch (e: any) {
+  return NextResponse.json(
+    { message: e.message || 'Quota check failed' },
+    { status: 429 }
+  )
+}
 
     // ── 4. Load workflow steps ───────────────────────────────────
     const stepsData = await hasuraAdminQuery(`
